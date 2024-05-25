@@ -19,5 +19,10 @@ Ce projet est un jeu de combat en Python inspiré par le jeu Street Fighter avec
 
 ##Installation
 
+Python et pygame doivent etre installés : 
+```
+pip install pygame
+```
+
 
 
