@@ -17,7 +17,7 @@ Ce projet est un jeu de combat en Python inspiré par le jeu Street Fighter avec
 - Beaucoup de docs dans le code pour expliquer
 - Une option débug est disponible dans le code pour montrer les hitbox des boutons et des joueurs
 
-##Installation
+## Installation
 
 Python et pygame doivent etre installés : 
 ```
