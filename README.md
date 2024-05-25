@@ -8,7 +8,7 @@
 
 
 ## Description
-Ce projet est un jeu de combat en Python inspiré par le jeu Street Fighter avec des rats jouable à 2 joueurs. Le jeu avait été fait pour un projet de 2 mois en Nsi (on a eu 20/20:wink:).
+Ce projet est un jeu de combat en Python inspiré par le jeu Street Fighter avec des rats jouable à 2 joueurs. Le jeu avait été fait pour un projet de 2 mois en Nsi (on a eu 20/20 :wink: ).
 
 ## Fonctionalités
 
