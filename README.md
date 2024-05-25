@@ -4,7 +4,7 @@
 
 ## Credits
 * Programmation : Mathias Kammermayer et Nils Rahma
-* Graphiste : Luca Prastrana
+* Graphismes : Luca Pastrana
 
 
 ## Description
