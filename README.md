@@ -24,5 +24,7 @@ Python et pygame doivent etre installés :
 pip install pygame
 ```
 
+Il faut simplement télécharger en .zip, l'extraire et c'est bon !
+
 
 
