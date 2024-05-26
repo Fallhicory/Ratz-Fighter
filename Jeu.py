@@ -1,6 +1,6 @@
 import pygame
 from combattant import Combattant
-debug = True #! pas oublier de changer aussi dans Combattant.py ! 
+debug = False #! pas oublier de changer aussi dans Combattant.py ! 
 
 # Initialisation de Pygame
 pygame.init()
