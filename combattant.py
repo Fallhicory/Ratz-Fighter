@@ -1,6 +1,6 @@
 import pygame
 
-debug = True  # ! pas oublier de changer aussi dans jeu.py !
+debug = False  # ! pas oublier de changer aussi dans jeu.py !
 
 class Combattant:
     def __init__(self, joueur, x, y):
