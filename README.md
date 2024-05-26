@@ -2,7 +2,7 @@
 
 ![Sans titre-1](https://github.com/Fallhicory/Ratz-Fighter/assets/84321793/49b33dbe-7d17-4d51-9658-d973353eab9e)
 
-![Static Badge](https://img.shields.io/badge/:badgeContent)
+![Static Badge](https://img.shields.io/badge/python-3.0_/3.12-blue)
 
 ## Credits
 * Programmation : Mathias Kammermayer et Nils Rahma
@@ -22,8 +22,6 @@ Ce projet est un jeu de combat en Python inspiré par le jeu Street Fighter avec
 ## Installation
 
 Python et pygame doivent etre installés : 
-
-![Static Badge](https://img.shields.io/badge/:badgeContent)
 
 ```
 pip install pygame
