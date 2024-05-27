@@ -2,7 +2,8 @@
 
 ![Sans titre-1](https://github.com/Fallhicory/Ratz-Fighter/assets/84321793/49b33dbe-7d17-4d51-9658-d973353eab9e)
 
-![Static Badge](https://img.shields.io/badge/python-3.0_/3.12-blue)
+![Static Badge](https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue)
+![Static Badge](https://img.shields.io/badge/VSCode-0078D4?style=for-the-badge&logo=visual%20studio%20code&logoColor=white)
 
 ## Credits
 * Programmation : Mathias Kammermayer et Nils Rahma
