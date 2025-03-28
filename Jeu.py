@@ -48,7 +48,42 @@ FPS = 60 #Frame Per Second (Img/sec)
 crtl_j1 = "Clavier"
 crtl_j2 = "Clavier"
 
+
+def gerer_musique(action, piste=None, boucle=-1):
+    """Gère la musique en fonction de l'état de la variable `musique_active`.
+
+    Paramètres:
+    action (str): Peut être "jouer", "pause", "stop", ou "reprendre".
+    piste (str): Chemin de la piste à jouer, si applicable.
+    boucle (int): Nombre de répétitions pour la lecture de la musique (-1 pour une boucle infinie).
+    """
+    global musique_active
+
+    if action == "jouer" and musique_active:
+        pygame.mixer.music.load(piste)
+        pygame.mixer.music.play(boucle)
+    elif action == "pause":
+        pygame.mixer.music.pause()
+    elif action == "stop":
+        pygame.mixer.music.stop()
+    elif action == "reprendre" and musique_active:
+        pygame.mixer.music.unpause()
+
 def Menu():
+    """
+    Affiche et gère le menu principal du jeu.
+    Cette fonction gère la boucle du menu principal, où l'utilisateur peut interagir
+    avec les boutons "Jouer", "Options" et "Quitter". Elle traite les événements utilisateur,
+    met à jour l'affichage et effectue des transitions vers d'autres parties du jeu
+    en fonction de la sélection de l'utilisateur.
+    Variables globales :
+        jeu_en_cours (bool): Indique si le jeu est en cours d'exécution.
+    Actions des boutons :
+        - "Jouer" : Lance le jeu en arrêtant la musique actuelle, en jouant la musique
+          du niveau et en appelant la fonction `Jeu`.
+        - "Options" : Ouvre le menu des options en appelant la fonction `Options`.
+        - "Quitter" : Quitte le jeu.
+    """
     global jeu_en_cours
 
     while jeu_en_cours:
@@ -57,12 +92,10 @@ def Menu():
                 jeu_en_cours = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    if Bouton_Play.collidepoint(event.pos):# # Si le clic est sur le bouton "Play"
+                    if Bouton_Play.collidepoint(event.pos):  # Si le clic est sur le bouton "Jouer"
                         boutton_ok.play()
-                        pygame.mixer.music.stop()
-                          # Arrête la musique actuelle
-                        pygame.mixer.music.load("assets/Musique niveau.mp3")  # Charge la nouvelle musique
-                        pygame.mixer.music.play(-1)
+                        gerer_musique("stop")
+                        gerer_musique("jouer", "assets/Musique niveau.mp3", -1)
                         Jeu()  # Joue la nouvelle musique en boucle
                     elif Bouton_options.collidepoint(event.pos):
                         boutton_ok.play()
@@ -86,66 +119,79 @@ def Menu():
         pygame.display.flip()#Met à jour la surface d'affichage complète à l'écran
         #blit = dessiner une image sur une autre
 
-def Options(): #Menu Options (a ajouter si besoin)
-    global jeu_en_cours, crtl_j1, crtl_j2
+
+musique_active = True
+def Options():
+    """
+    Affiche et gère le menu "Options".
+    Permet de changer les contrôles des joueurs (Clavier/Manette), activer/désactiver
+    la musique et revenir au menu précédent. Affiche les boutons et gère les clics.
+    """
+    global jeu_en_cours, crtl_j1, crtl_j2, musique_active
 
     bouton_retour = pygame.Rect(30, 30, 275, 45)
-    bouton_j1_clavier = pygame.Rect(220, 300, 310, 50)
-    bouton_j1_manette = pygame.Rect(590, 300, 310, 50)
-    bouton_j2_clavier = pygame.Rect(220, 605, 310, 50)
-    bouton_j2_manette = pygame.Rect(590, 605, 310, 50)
+    bouton_j1_toggle = pygame.Rect(220, 300, 310, 50)  # Bouton pour basculer Joueur 1
+    bouton_j2_toggle = pygame.Rect(220, 500, 310, 50)  # Bouton pour basculer Joueur 2
+    bouton_musique = pygame.Rect(450, 600, 500, 50)  # Bouton pour basculer la musique
 
     while jeu_en_cours:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 jeu_en_cours = False
-            elif event.type == pygame.MOUSEBUTTONDOWN: #si il clique 
-                if event.button == 1: # Si le clic est le clic gauche
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
                     if bouton_retour.collidepoint(event.pos):
                         boutton_annu.play()
-                        ecran.fill((0, 0, 0)) #efface le texte
-                        return #reviens a la dernière action
-                    elif bouton_j1_clavier.collidepoint(event.pos):
-                        crtl_j1 = "Clavier"
+                        ecran.fill((0, 0, 0))
+                        return
+                    elif bouton_j1_toggle.collidepoint(event.pos):
+                        # Alterne entre "Clavier" et "Manette" pour Joueur 1
+                        crtl_j1 = "Manette" if crtl_j1 == "Clavier" else "Clavier"
                         boutton_ok.play()
-                    elif bouton_j1_manette.collidepoint(event.pos):
-                        crtl_j1 = "Manette"
+                    elif bouton_j2_toggle.collidepoint(event.pos):
+                        # Alterne entre "Clavier" et "Manette" pour Joueur 2
+                        crtl_j2 = "Manette" if crtl_j2 == "Clavier" else "Clavier"
                         boutton_ok.play()
-                    elif bouton_j2_clavier.collidepoint(event.pos):
-                        crtl_j2 = "Clavier"
-                        boutton_ok.play()
-                    elif bouton_j2_manette.collidepoint(event.pos):
-                        crtl_j2 = "Manette"
-                        boutton_ok.play()
-
+                    elif bouton_musique.collidepoint(event.pos):
+                        musique_active = not musique_active
+                        if musique_active:
+                            gerer_musique("reprendre")
+                            boutton_ok.play()
+                        else:
+                            gerer_musique("pause")
+                            boutton_ok.play()
         ecran.fill((0, 0, 0))
         
-        
         if debug:
-            pygame.draw.rect(ecran, "red", bouton_j1_clavier,2)
-            pygame.draw.rect(ecran, "red", bouton_j1_manette,2)
-            pygame.draw.rect(ecran, "red", bouton_j2_clavier,2)
-            pygame.draw.rect(ecran, "red", bouton_j2_manette,2)
-            pygame.draw.rect(ecran, "red", bouton_retour,2)
-        
+            pygame.draw.rect(ecran, "red", bouton_j1_toggle, 2)
+            pygame.draw.rect(ecran, "red", bouton_j2_toggle, 2)
+            pygame.draw.rect(ecran, "red", bouton_retour, 2)
+            pygame.draw.rect(ecran, "red", bouton_musique, 2)
 
-        # Ajouter les boutons pour les contrôles
+        # Titre Options
         options_titre = police_menu.render("Options", True, (255, 255, 255))
         ecran.blit(options_titre, (520, 100))
 
+        # Bouton Retour
         retour_txt = police_menu.render("Retour", True, (255, 255, 255))
         ecran.blit(retour_txt, (30, 30))
 
-        ecran.blit(police_menu.render(f"Joueur 1 - {crtl_j1}", True, (255, 255, 255)), (200, 250))
-        ecran.blit(police_menu.render("Clavier", True, (255,255,255)), (220, 300))  # 60px d'écart
-        ecran.blit(police_menu.render("Manette", True, (255,255,255)), (590, 300))
+        # Contrôles Joueur 1
+        ecran.blit(police_menu.render(f"Joueur 1 : {crtl_j1}", True, (255, 255, 255)), (200, 250))
+        toggle_j1_txt = police_menu.render("Changer", True, (255, 255, 255))
+        ecran.blit(toggle_j1_txt, (220, 300))
 
-        ecran.blit(police_menu.render(f"Joueur 2 - {crtl_j2}", True, (255, 255, 255)), (200, 550))
-        ecran.blit(police_menu.render("Clavier", True, (255,255,255)), (220, 610))
-        ecran.blit(police_menu.render("Manette", True, (255,255,255)), (590, 610))
+        # Contrôles Joueur 2
+        ecran.blit(police_menu.render(f"Joueur 2 : {crtl_j2}", True, (255, 255, 255)), (200, 450))
+        toggle_j2_txt = police_menu.render("Changer", True, (255, 255, 255))
+        ecran.blit(toggle_j2_txt, (220, 500))
 
-       
-        pygame.display.flip() # # Mise à jour de l'affichage
+        # Bouton Musique avec état actuel
+        texte_musique = "Musique: ON" if musique_active else "Musique: OFF"
+        musique_txt = police_menu.render(texte_musique, True, (255, 255, 255))
+        ecran.blit(musique_txt, (450, 600))
+
+        pygame.display.flip()
 
 
 def Menu_Pause():
@@ -209,6 +255,25 @@ def Menu_Pause():
         pygame.display.update()
         tmps.tick(15)  # Limite le FPS pour réduire l'utilisation du processeur
 
+def afficher_texte_degrade(surface, texte, police, position, couleur1, couleur2, decalage=5):
+    """
+    Affiche un texte avec un effet de dégradé (ombrage).
+
+    Paramètres:
+    surface (pygame.Surface): La surface où afficher le texte.
+    texte (str): Le texte à afficher.
+    police (pygame.font.Font): La police du texte.
+    position (tuple): Position (x, y) du texte.
+    couleur1 (tuple): Couleur de l'ombre (R, G, B).
+    couleur2 (tuple): Couleur du texte principal (R, G, B).
+    decalage (int): Déplacement de l'ombre.
+    """
+    ombre = police.render(texte, True, couleur1)
+    texte_principal = police.render(texte, True, couleur2)
+    surface.blit(ombre, (position[0] + decalage, position[1] + decalage))
+    surface.blit(texte_principal, position)
+
+
 def dessin_fond(ecran, fd_img):
     """
     Dessine le fond du niveau et le recadre correctement en fonction de la fenetre
@@ -222,30 +287,15 @@ def dessin_fond(ecran, fd_img):
     ecran.blit(recad_fd, (0, 0))#update de l'ecran
     
 
-def des_barre_vie(ecran, sante, x, y,):
-    """
-    Dessine les barres de vie a l'écran
-
-    Paramètres:
-    ecran (pygame.Surface): The surface ou l'on va mettre les barres de vie.
-    sante (float): La santé actuelle du personnage
-    x (int)
-    y (int)
-    """
-    ratio = sante / 100 # Calcule le ratio de la santé
-    pygame.draw.rect(ecran, "white", (x - 2, y - 2, 544, 48)) #3 px d'écart
-    pygame.draw.rect(ecran,(218, 32, 46), (x, y, 540, 45))
+def des_barre_vie(ecran, sante, x, y):
+    ratio = sante / 100
+    pygame.draw.rect(ecran, "white", (x - 2, y - 2, 544, 48))
+    pygame.draw.rect(ecran, (218, 32, 46), (x, y, 540, 45))
     pygame.draw.rect(ecran, (57, 178, 81), (x, y, 540 * ratio, 45))
-    
-    fd_j1 = police_jeu.render(f"Joueur 1: {score[0]}", True, (0, 0, 0))#dégradé (5 px X de déc)
-    ecran.blit(fd_j1, (9, 16))
-    fd_j2 = police_jeu.render(f"Joueur 2: {score[1]}", True, (0,0,0))
-    ecran.blit(fd_j2, (1055, 16))
-    nom_j1 = police_jeu.render(f"Joueur 1: {score[0]}", True, (255, 255, 255))
-    ecran.blit(nom_j1, (13, 18))
-    nom_j2 = police_jeu.render(f"Joueur 2: {score[1]}", True, (255, 255, 255))
-    ecran.blit(nom_j2, (1059, 18))
-    
+
+    afficher_texte_degrade(ecran, f"Joueur 1: {score[0]}", police_jeu, (13, 15), (0, 0, 0), (255, 255, 255))
+    afficher_texte_degrade(ecran, f"Joueur 2: {score[1]}", police_jeu, (1059, 15), (0, 0, 0), (255, 255, 255))
+
 
 def txt_info(texte,x,y):
     """
@@ -302,7 +352,7 @@ def Jeu():
         if round_fini:
             if (pygame.time.get_ticks() - round_fini_cooldown) >= 3000:
                 round_fini = False
-                intro_cpt = 3
+                intro_cpt = 4 #+1 à mettre
                 joueur_1 = Combattant(1, 200, 450)
                 joueur_2 = Combattant(2, 1100, 450)
             if joueur_1.est_mort():

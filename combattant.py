@@ -153,7 +153,7 @@ class Combattant:
 
     def update(self):
         """
-        Gère les animations des attaques
+        Gère les animations des attaques et du saut
 
         Paramètres :
         self:numéro du joueur
@@ -166,6 +166,9 @@ class Combattant:
                 self.image = self.coup_de_pied
             elif self.type_attaque == 3:
                 self.image = self.coup_de_queue
+        elif self.saut:
+            self.rect = pygame.Rect((self.rect.x, self.rect.y, 140, 200))
+            self.image = self.image_saut
         else:
             self.rect = pygame.Rect((self.rect.x, self.rect.y, 140, 200))
             self.image = self.idle_image
@@ -204,43 +207,62 @@ class Combattant:
         Paramètres:
         ecran (pygame.Surface) : La surface où sera dessiné le combattant
         """
-        # Afficher l'image du combattant
+        # Affiche l'image du combattant
         temp_image = self.image
 
-        # Inverser l'image si le combattant est tourné vers la gauche
+        # Inverse l'image si le combattant est tourné vers la gauche
         if (self.joueur == 1 and self.direction == -1) or (self.joueur == 2 and self.direction == 1):
             temp_image = pygame.transform.flip(temp_image, True, False)
 
-        # Redimensionner l'image pour l'adapter à la hitbox du combattant
-        temp_image = pygame.transform.scale(temp_image, (self.rect.width, self.rect.height))
+        if self.est_mort():
+            # Pour l'image de mort, redimensionner à une taille réduite
+            echelle = 0.55  # (0.7 = 70% de la taille originale) 
+            nv_largeur = int(temp_image.get_width() * echelle)
+            nv_hauteur = int(temp_image.get_height() * echelle)
+            temp_image = pygame.transform.scale(temp_image, (nv_largeur, nv_hauteur))
 
-        # Ajouter un décalage pour les attaques
-        decalage_x = 0
-        if self.attaquer:
+            # Ajuster la position pour centrer l'image réduite
+            decalage_x = (self.rect.width - nv_largeur) // 2
+            decalage_y = self.rect.height - nv_hauteur + 20  # 20 pixels de décalage vers le bas
+
+            ecran.blit(temp_image, (self.rect.x + decalage_x, self.rect.y + decalage_y))
+        elif self.attaquer or self.saut:
+            # Pour les attaques et le saut, conserve la hauteur de l'image idle
+            idle_height = self.idle_image.get_height()
+
+            # Calcule le ratio de redimensionnement pour garder la hauteur de l'idle
+            scale_height = self.rect.height / idle_height
+            nv_largeur = int(temp_image.get_width() * scale_height)
+
+            # Redimensionne l'image
+            temp_image = pygame.transform.scale(temp_image, (nv_largeur, self.rect.height))
+
+            # Ajoute un décalage pour les attaques et le saut
+            decalage_x = 0
             if self.type_attaque == 1:  # Coup de poing
                 if self.direction == 1:  # Punch
-                    decalage_x = 15  # Ajuster le décalage pour que le coup de poing dépasse la hitbox
+                    decalage_x = 15  
                 else:
-                    decalage_x = -15  # Déplacer le coup de poing à gauche de la hitbox
+                    decalage_x = -15  # Déplace le coup de poing à gauche de la hitbox
             elif self.type_attaque == 2:  # Coup de pied
                 if self.direction == 1:  # Kick
-                    decalage_x = 25  # Ajuster le décalage si nécessaire
+                    decalage_x = 25  
                 else:
-                    decalage_x = -20  # Déplacer le coup de pied à gauche de la hitbox
+                    decalage_x = -20  # Déplace le coup de pied à gauche de la hitbox
             elif self.type_attaque == 3:  # Coup de queue
-                if self.direction == 1:  
-                    decalage_x = 25  # Ajuster le décalage si nécessaire
+                if self.direction == 1:
+                    decalage_x = 25  
                 else:
                     decalage_x = -20  # Déplacer le coup de queue à gauche de la hitbox
-        if self.est_mort():#En test,ne marche pas
-            decalage_y = 20  # Décalage vers le haut pour la mort
-        else:
-            decalage_y = 0  # Aucun décalage si le personnage n'est pas mort
 
-        ecran.blit(temp_image, (self.rect.x + decalage_x, self.rect.y + decalage_y))
+            ecran.blit(temp_image, (self.rect.x + decalage_x, self.rect.y))
+        else:
+            # Pour les images idle et autres, redimensionne normalement
+            temp_image = pygame.transform.scale(temp_image, (self.rect.width, self.rect.height))
+            ecran.blit(temp_image, (self.rect.x, self.rect.y))
 
         if debug:
-            # Dessiner le rectangle du combattant en vert
+            # Dessine le rectangle du combattant en vert
             pygame.draw.rect(ecran, (0, 255, 0), self.rect, 2)
 
     def afficher_info(self, ecran):
@@ -253,5 +275,4 @@ class Combattant:
         pol = pygame.font.SysFont(None, 24)
         info_txt = f"Joueur {self.joueur}: x={self.rect.x}, y={self.rect.y}, HP={self.sante} Attaque={self.type_attaque}, Direction= {self.direction}"
         txt_ecran = pol.render(info_txt, True, (255, 255, 255))
-        ecran.blit(txt_ecran, (self.rect.x - 40, self.rect.y - 20))  # Positionner le texte juste au-dessus du personnage
-        
+        ecran.blit(txt_ecran, (self.rect.x - 40, self.rect.y - 20))  # Positionne le texte juste au-dessus du personnage
