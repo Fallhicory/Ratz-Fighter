@@ -1,6 +1,6 @@
 import pygame
 from combattant import Combattant
-debug = False # ! pas oublier de changer aussi dans Combattant.py ! 
+debug = False # ! pas oublier de changer aussi dans Combattant.py !
 
 # Initialisation de Pygame
 pygame.init()
@@ -19,11 +19,11 @@ pygame.display.set_caption("Ratz Fighter")
 
 # Chargement des ressources
 titre_img = pygame.image.load("assets/Titre RATZ FIGHTER.png")
-titre_img = pygame.transform.scale(titre_img, (1800, 700)) #titre menu et scale en x y 
+titre_img = pygame.transform.scale(titre_img, (1800, 700)) #titre menu et scale en x y
 fd_img = pygame.image.load("assets/fd de niveau.png").convert_alpha() #fd jeu
-police_menu = pygame.font.Font("assets/font.ttf", 45) 
+police_menu = pygame.font.Font("assets/font.ttf", 45)
 police_jeu = pygame.font.Font("assets/font.ttf", 30) #juste pour taille
-police_decompte = pygame.font.Font("assets/font.ttf", 60) 
+police_decompte = pygame.font.Font("assets/font.ttf", 60)
 
 pygame.mixer.music.load("assets/intro.mp3")#que menu
 pygame.mixer.music.set_volume(0.2)
@@ -33,7 +33,7 @@ pygame.mixer.music.play(1) # Lit la musique d'intro une fois
 Bouton_Play = pygame.Rect(610, 355, 180, 50)#X,Y, Longueur, Largeur
 Bouton_options = pygame.Rect(545, 460, 310, 50)
 Bouton_exit = pygame.Rect(545, 570, 310, 50)
-boutton_ok = pygame.mixer.Sound("assets/menuok.wav") 
+boutton_ok = pygame.mixer.Sound("assets/menuok.wav")
 boutton_annu = pygame.mixer.Sound("assets/menuannule.wav")
 intro_cpt = 0
 der_cpt_maj = pygame.time.get_ticks()
@@ -43,6 +43,7 @@ round_fini_cooldown = 1000 #! Pas 3sec sinon - de temps au compteur !
 
 # Variables de jeu
 jeu_en_cours = True
+musique_active = True
 tmps = pygame.time.Clock() #crée une horloge dans le corps du programme
 FPS = 60 #Frame Per Second (Img/sec)
 crtl_j1 = "Clavier"
@@ -120,7 +121,6 @@ def Menu():
         #blit = dessiner une image sur une autre
 
 
-musique_active = True
 def Options():
     """
     Affiche et gère le menu "Options".
@@ -161,7 +161,7 @@ def Options():
                             gerer_musique("pause")
                             boutton_ok.play()
         ecran.fill((0, 0, 0))
-        
+
         if debug:
             pygame.draw.rect(ecran, "red", bouton_j1_toggle, 2)
             pygame.draw.rect(ecran, "red", bouton_j2_toggle, 2)
@@ -203,7 +203,7 @@ def Menu_Pause():
     bouton_reprendre = pygame.Rect(500, 350, 400, 50)
     bouton_options = pygame.Rect(545, 460, 310, 50)
     bouton_quitter = pygame.Rect(545, 570, 310, 50)
-    
+
       # Joue l'effet sonore  # Met en pause la musique
     while True:
         for event in pygame.event.get():
@@ -213,23 +213,23 @@ def Menu_Pause():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     son_pause.play() # Si la touche "Échap" est enfoncée, reprendre le jeu
-                    pygame.mixer.music.unpause() 
+                    gerer_musique("reprendre")
                     return
-            elif event.type == pygame.MOUSEBUTTONDOWN: #si il clique 
+            elif event.type == pygame.MOUSEBUTTONDOWN: #si il clique
                 if event.button == 1: # Si le clic est le clic gauche
                     if bouton_reprendre.collidepoint(event.pos):
                         boutton_annu.play()
-                        pygame.mixer.music.unpause()
+                        gerer_musique("reprendre")
                         return
                     elif bouton_options.collidepoint(event.pos):
                         boutton_ok.play()
                         Options()
                     elif bouton_quitter.collidepoint(event.pos):
                         pygame.quit()
-            
+
 
         # Affichage du menu pause
-        if debug : 
+        if debug :
             pygame.draw.rect(ecran, "red", bouton_reprendre,2)
             pygame.draw.rect(ecran, "red", bouton_options,2)
             pygame.draw.rect(ecran, "red", bouton_quitter,2)
@@ -247,11 +247,11 @@ def Menu_Pause():
         exit_texte = police_menu.render("Quitter", True, (255, 255, 255))
         #pygame.draw.rect(ecran, "red", bouton_quitter)
         ecran.blit(exit_texte, (545, 570))
-        if debug : 
+        if debug :
             pygame.draw.rect(ecran, "red", bouton_reprendre,2)
             pygame.draw.rect(ecran, "red", bouton_options,2)
             pygame.draw.rect(ecran, "red", bouton_quitter,2)
-        
+
         pygame.display.update()
         tmps.tick(15)  # Limite le FPS pour réduire l'utilisation du processeur
 
@@ -285,7 +285,7 @@ def dessin_fond(ecran, fd_img):
     """
     recad_fd = pygame.transform.scale(fd_img, (1400, 800)) #recadre par échelle l'mg par fenetre
     ecran.blit(recad_fd, (0, 0))#update de l'ecran
-    
+
 
 def des_barre_vie(ecran, sante, x, y):
     ratio = sante / 100
@@ -344,7 +344,7 @@ def Jeu():
         joueur_1.des(ecran)
         joueur_2.des(ecran)
 
-        
+
         if debug:
             joueur_1.afficher_info(ecran)
             joueur_2.afficher_info(ecran)
@@ -374,6 +374,6 @@ def Jeu():
 
         pygame.display.update()
     pygame.quit()
-    
+
 Menu()
 pygame.quit()
