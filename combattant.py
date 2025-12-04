@@ -23,6 +23,15 @@ class Combattant:
         self.image_saut = pygame.image.load(f"assets/Rat {self.joueur}/rat_{self.joueur} saut.png").convert_alpha()
         self.image = self.idle_image
 
+        # Initialisation du joystick
+        self.joystick = None
+        if pygame.joystick.get_count() >= joueur:
+            try:
+                self.joystick = pygame.joystick.Joystick(joueur - 1)
+                self.joystick.init()
+            except pygame.error:
+                print(f"Erreur d'initialisation du joystick pour le joueur {joueur}")
+
     def Mouv(self, ecran_long, ecran_larg, surface, cible, controle):
         """
         Gère la logique de mouvement et de combat du combattant.
@@ -97,11 +106,9 @@ class Combattant:
                         self.der_tmp_combat = pygame.time.get_ticks()
                         self.type_attaque = 2
 
-        elif controle == "Manette":
+        elif controle == "Manette" and self.joystick:
             # Gestion des contrôles manette
-            joystick = pygame.joystick.Joystick(self.joueur - 1)  # Récupére le joystick correspondant au joueur
-            joystick.init()  # Initialise le module joystick
-            axe_x = joystick.get_axis(0)  # Récupére la valeur de l'axe X (gauche/droite) du joystick
+            axe_x = self.joystick.get_axis(0)  # Récupére la valeur de l'axe X (gauche/droite) du joystick
             if abs(axe_x) < zone_morte:
                 axe_x = 0  # Applique la zone morte
             dirx = axe_x * vitesse  # Calcule la direction horizontale en fonction de l'axe X
@@ -109,20 +116,20 @@ class Combattant:
                 self.direction = -1  # Changer la direction vers la gauche
             elif dirx > 0:
                 self.direction = 1  # Changer la direction vers la droite
-            if joystick.get_button(0) and not self.saut:  # bouton X ou A
+            if self.joystick.get_button(0) and not self.saut:  # bouton X ou A
                 self.velo_y = -30
                 self.saut = True
-            if joystick.get_button(1) and not self.attaquer:  # Bouton O ou B
+            if self.joystick.get_button(1) and not self.attaquer:  # Bouton O ou B
                 self.attaquer = True
                 self.attaque(surface, cible, 5)  # Coup de poing : 5 dégâts
                 self.der_tmp_combat = pygame.time.get_ticks()
                 self.type_attaque = 1
-            if joystick.get_button(2) and not self.attaquer:  # Bouton Carré ou X
+            if self.joystick.get_button(2) and not self.attaquer:  # Bouton Carré ou X
                 self.attaquer = True
                 self.attaque(surface, cible, 10)  # Coup de pied : 10 dégâts
                 self.der_tmp_combat = pygame.time.get_ticks()
                 self.type_attaque = 2
-            if joystick.get_button(3) and not self.attaquer:  # bouton Triangle ou Y
+            if self.joystick.get_button(3) and not self.attaquer:  # bouton Triangle ou Y
                 self.attaquer = True
                 self.attaque(surface, cible, 20)  # Coup de queue : 20 dégâts
                 self.der_tmp_combat = pygame.time.get_ticks()
@@ -191,7 +198,7 @@ class Combattant:
         else:
             attaquer_rect = pygame.Rect(self.rect.right, self.rect.y, 120, self.rect.height)  # Zone d'attaque vers la droite
 
-        
+
         if attaquer_rect.colliderect(cible.rect):
             cible.sante -= degats
             print(f"Joueur touché par joueur {self.joueur} (- {degats} HP)")
@@ -216,7 +223,7 @@ class Combattant:
 
         if self.est_mort():
             # Pour l'image de mort, redimensionner à une taille réduite
-            echelle = 0.55  # (0.7 = 70% de la taille originale) 
+            echelle = 0.55  # (0.7 = 70% de la taille originale)
             nv_largeur = int(temp_image.get_width() * echelle)
             nv_hauteur = int(temp_image.get_height() * echelle)
             temp_image = pygame.transform.scale(temp_image, (nv_largeur, nv_hauteur))
@@ -241,17 +248,17 @@ class Combattant:
             decalage_x = 0
             if self.type_attaque == 1:  # Coup de poing
                 if self.direction == 1:  # Punch
-                    decalage_x = 15  
+                    decalage_x = 15
                 else:
                     decalage_x = -15  # Déplace le coup de poing à gauche de la hitbox
             elif self.type_attaque == 2:  # Coup de pied
                 if self.direction == 1:  # Kick
-                    decalage_x = 25  
+                    decalage_x = 25
                 else:
                     decalage_x = -20  # Déplace le coup de pied à gauche de la hitbox
             elif self.type_attaque == 3:  # Coup de queue
                 if self.direction == 1:
-                    decalage_x = 25  
+                    decalage_x = 25
                 else:
                     decalage_x = -20  # Déplacer le coup de queue à gauche de la hitbox
 
